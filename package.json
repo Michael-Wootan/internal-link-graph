@@ -1,0 +1,19 @@
+{
+  "name": "internal-link-graph",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Builds the internal link graph of a Shopify blog, finds orphan pages and broken internal links, suggests contextual links with anchors, and injects the approved ones.",
+  "main": "src/link-graph.js",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "graph": "node src/link-graph.js",
+    "report": "node src/link-graph.js --report-only",
+    "fix-broken": "node src/link-graph.js --fix-broken",
+    "inject": "node src/inject-links.js",
+    "test": "node scripts/test-graph.js"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "nodemailer": "^8.0.11"
+  }
+}

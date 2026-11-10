@@ -1,0 +1,68 @@
+name: Link Graph Analysis
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'   # Monday 13:00 UTC
+  workflow_dispatch:
+    inputs:
+      fix_broken:
+        description: 'Auto-fix broken internal links'
+        type: boolean
+        default: false
+      dry_run:
+        description: 'Preview fixes without writing (requires fix_broken)'
+        type: boolean
+        default: false
+
+concurrency:
+  group: link-graph
+  cancel-in-progress: false
+
+jobs:
+  run:
+    # Scheduled runs are off until the repository variable ENABLE_SCHEDULE is 'true',
+    # so a fresh fork or an unconfigured copy never runs (or fails) on its own.
+    if: github.event_name == 'workflow_dispatch' || vars.ENABLE_SCHEDULE == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - run: npm test
+
+      # config/link-targets.json is gitignored; CI writes it from a repository variable
+      - name: Write link target config
+        env:
+          LINK_TARGETS_JSON: ${{ vars.LINK_TARGETS_JSON }}
+        run: |
+          if [ -n "$LINK_TARGETS_JSON" ]; then printf '%s' "$LINK_TARGETS_JSON" > config/link-targets.json; fi
+
+      - name: Build the link graph
+        run: node src/link-graph.js --refresh ${{ inputs.fix_broken && '--fix-broken' || '' }} ${{ inputs.dry_run && '--dry-run' || '' }}
+        env:
+          SHOPIFY_ADMIN_TOKEN:  ${{ secrets.SHOPIFY_ADMIN_TOKEN }}
+          SHOPIFY_STORE:        ${{ secrets.SHOPIFY_STORE }}
+          SHOPIFY_BLOG_ID:      ${{ vars.SHOPIFY_BLOG_ID }}
+          SHOPIFY_BLOG_HANDLE:  ${{ vars.SHOPIFY_BLOG_HANDLE }}
+          SITE_URL:             ${{ vars.SITE_URL }}
+          COMPANY_NAME:         ${{ vars.COMPANY_NAME }}
+          GMAIL_USER:           ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD:   ${{ secrets.GMAIL_APP_PASSWORD }}
+          EMAIL_NOTIFY:         ${{ vars.EMAIL_NOTIFY }}
+
+      # The report, the suggestion CSV and the broken-link list are the run's deliverables
+      - name: Upload report and suggestions
+        uses: actions/upload-artifact@v4
+        with:
+          name: link-graph-output
+          path: |
+            output/link-graph-report.txt
+            output/approved-links.csv
+            output/broken-internal-links.json
+          if-no-files-found: ignore

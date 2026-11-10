@@ -1,0 +1,23 @@
+{
+  "canonicalUrls": {
+    "brewing": "/blogs/news/pour-over-coffee-brewing-guide",
+    "storage": "/blogs/news/how-to-store-coffee-beans",
+    "roast-levels": "/blogs/news/light-roast-vs-dark-roast"
+  },
+  "moneyPages": [
+    { "url": "/products/ethiopia-natural-light-roast", "keywords": ["ethiopia", "natural process", "light roast"], "priority": 90 },
+    { "url": "/products/espresso-blend", "keywords": ["espresso", "crema", "espresso blend"], "priority": 85 },
+    { "url": "/products/wholesale-coffee-5lb", "keywords": ["wholesale", "bulk coffee", "5 lb"], "priority": 80 }
+  ],
+  "deprecatedUrls": [
+    "/blogs/news/old-brewing-guide-2023"
+  ],
+  "topicClusters": {
+    "brewing": ["brew", "brewing", "pour", "french press", "aeropress", "drip", "grind"],
+    "espresso": ["espresso", "crema", "latte", "cappuccino", "portafilter"],
+    "roasting": ["roast", "roasted", "roasting", "roaster", "light", "dark", "medium"],
+    "origin": ["ethiopia", "colombia", "kenya", "guatemala", "origin", "arabica", "robusta"],
+    "storage": ["store", "storage", "fresh", "freshness", "shelf", "freeze"],
+    "wholesale": ["wholesale", "bulk", "supplier", "distributor", "b2b", "cafe", "restaurant"]
+  }
+}
